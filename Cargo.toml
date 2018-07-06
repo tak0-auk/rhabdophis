@@ -1,0 +1,7 @@
+[package]
+name = "rhabdophis"
+version = "0.0.1"
+authors = ["takashima <tak0auk@gmail.com>"]
+
+[dependencies]
+
