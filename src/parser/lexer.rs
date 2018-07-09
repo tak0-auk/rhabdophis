@@ -73,13 +73,19 @@ impl Lexer {
 
     fn read_alphabet(&mut self) -> Result<Token, ()> {
         let start = self.pos;
-        let alphabet = self.skip_while(|c| c.is_alphabetic() || c == '_')?;
-        Ok(Token::new_identifier(alphabet, start, self.pos))
+        let alphabet = self.skip_while(|c| c.is_alphanumeric() || c == '_')?;
+        Ok(Token::new_identifier(alphabet))
+    }
+
+    fn read_number(&mut self) -> Result<Token, ()> {
+        let start = self.pos;
+        // let number = self.skip_while(|c| )?;
+        Ok(Token::new_number("12345".to_string()))
     }
 
     fn read_symbol(&mut self) -> Result<Token, ()> {
         self.pos += 1;
-        Ok(Token::new_string("none".to_string(), 0, 0))
+        Ok(Token::new_identifier("none".to_string()))
     }
 }
 
