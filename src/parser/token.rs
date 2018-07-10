@@ -1,5 +1,3 @@
-use std::ops::Range;
-
 #[derive(Debug, Clone)]
 pub struct Token {
     pub kind: TokenKind,
@@ -12,7 +10,7 @@ pub enum TokenKind {
     Int(i128),
     Float(f64),
     String(String),
-    Symbol(Symbol),
+    Symbol,
     Newline,
     Number,
     Indent,
@@ -41,76 +39,24 @@ impl Token {
         }
     }
 
-    pub fn new_symbol(symbol: Symbol) -> Token {
+    pub fn new_symbol(s: String) -> Token {
         Token {
-            kind: TokenKind::Symbol(symbol),
-            value: String::new(),
+            kind: TokenKind::Symbol,
+            value: s,
         }
     }
 
-    pub fn new_newline() -> Token {
+    pub fn new_newline(s: String) -> Token {
         Token {
             kind: TokenKind::Newline,
-            value: String::new(),
+            value: s,
         }
     }
 
-    pub fn new_indent(s: String, start: usize, end: usize) -> Token {
+    pub fn new_indent(s: String) -> Token {
         Token {
             kind: TokenKind::Indent,
             value: s,
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum Symbol {
-    OpeningParen,
-    ClosingParen,
-    OpeningBrace,
-    ClosingBrace,
-    OpeningBoxBracket,
-    ClosingBoxBracket,
-    Comma,
-    Semicolon,
-    Colon,
-    Point,
-    Arrow,
-    Inc,
-    Dec,
-    Add,
-    Sub,
-    Asterisk,
-    Div,
-    Mod,
-    Not,
-    BitwiseNot,
-    Shl,
-    Shr,
-    Lt,
-    Le,
-    Gt,
-    Ge,
-    Eq,
-    Ne,
-    And,
-    Or,
-    Xor,
-    LAnd,
-    LOr,
-    Question,
-    Assign,
-    AssignAdd,
-    AssignSub,
-    AssignMul,
-    AssignDiv,
-    AssignMod,
-    AssignShl,
-    AssignShr,
-    AssignAnd,
-    AssignOr,
-    AssignXor,
-    AssignLAnd,
-    AssignLOr,
-    Hash,
 }

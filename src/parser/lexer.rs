@@ -1,4 +1,4 @@
-use parser::token::{ Token, TokenKind };
+use parser::token::Token;
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -59,33 +59,40 @@ impl Lexer {
     pub fn read_token(&mut self) -> Result<Token, ()> {
         match self.next()? {
             'a'...'z' | 'A'...'Z' | '_' => self.read_alphabet(),
-            // '0'...'9' | '.' => self.read_number(),
-            // '\"' => self.read_string_literal(),
-            // '\n' | '\r' => self.read_newline(),
-            // c if c.is_whitespace() => {
-            //     // self.skip_whitespace()?;
-            //     // self.read_token()
-            //     self.read_indent()
-            // }
+            '0'...'9' => self.read_number(),
+            '\n' | '\r' => self.read_newline(),
+            c if c.is_whitespace() => {
+                self.read_indent()
+            }
             _ => self.read_symbol(),
         }
     }
 
     fn read_alphabet(&mut self) -> Result<Token, ()> {
-        let start = self.pos;
         let alphabet = self.skip_while(|c| c.is_alphanumeric() || c == '_')?;
         Ok(Token::new_identifier(alphabet))
     }
 
     fn read_number(&mut self) -> Result<Token, ()> {
-        let start = self.pos;
-        // let number = self.skip_while(|c| )?;
-        Ok(Token::new_number("12345".to_string()))
+        let number = self.skip_while(|c| match c {
+            '0'...'9' => true,
+            _ => false,
+        })?;
+        Ok(Token::new_number(number))
+    }
+
+    fn read_newline(&mut self) -> Result<Token, ()> {
+        let newline = self.skip_char()?;
+        Ok(Token::new_newline(newline.to_string()))
+    }
+
+    fn read_indent(&mut self) -> Result<Token, ()> {
+        let space = self.skip_while(|c| c.is_whitespace())?;
+        Ok(Token::new_indent(space))
     }
 
     fn read_symbol(&mut self) -> Result<Token, ()> {
-        self.pos += 1;
-        Ok(Token::new_identifier("none".to_string()))
+        Ok(Token::new_symbol(self.skip_char()?.to_string()))
     }
 }
 
