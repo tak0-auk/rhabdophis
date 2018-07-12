@@ -17,6 +17,7 @@ fn main() {
         },
         None => {
             println!("{}", DOC);
+            runtime::runtime::exec_repl();
             // executer::exec_repl()
         },
     };

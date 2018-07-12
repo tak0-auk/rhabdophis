@@ -96,14 +96,9 @@ impl Lexer {
     }
 }
 
-/////////////////////////////////////////////////////////////////////
-///
-///
-/////////////////////////////////////////////////////////////////////
+// #[test]
+// fn it_faild() {
+//     let mut lex = Lexer::new("a = 1 + 1".to_string());
+//     assert_eq!(lex.get_tokens().first().unwrap().kind, TokenKind::Newline);
 
-#[test]
-fn it_faild() {
-    let mut lex = Lexer::new("a = 1 + 1".to_string());
-    assert_eq!(lex.get_tokens().first().unwrap().kind, TokenKind::Newline);
-
-}
+// }
