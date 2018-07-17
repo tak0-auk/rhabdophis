@@ -1,4 +1,4 @@
-use parser::token::Token;
+use parser::token::{ Token, TokenKind };
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -19,7 +19,10 @@ impl Lexer {
     pub fn get_tokens(&mut self) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
         while let Ok(token) = self.read_token() {
-            tokens.push(token);
+            if token.kind != TokenKind::Pass {
+                tokens.push(token);
+            }
+
         }
         return tokens;
     }
@@ -30,8 +33,14 @@ impl Lexer {
         self.source.len() <= self.pos
     }
 
-    fn next(&self) -> Result<char, ()> {
+    fn c(&self) -> Result<char, ()> {
         self.source[self.pos..].chars().next().ok_or(())
+    }
+
+    fn next(&mut self) -> Result<char, ()> {
+        let ret = self.source[self.pos..].chars().next().ok_or(());
+        self.pos += 1;
+        return ret;
     }
 
     fn skip_while<F>(&mut self, mut f: F) -> Result<String, ()>
@@ -39,26 +48,29 @@ impl Lexer {
         F: FnMut(char) -> bool,
         {
             let mut v = vec![];
-            while !self.is_eos() && f(self.next()?) {
-                v.push(self.skip_char()? as u8);
+            while !self.is_eos() && f(self.c()?) {
+                v.push(self.next()? as u8);
             }
             Ok(String::from_utf8_lossy(v.as_slice()).to_owned().to_string())
         }
 
-    fn skip_char(&mut self) -> Result<char, ()> {
-        let mut iter = self.source[self.pos..].char_indices();
-        let (_, cur_char) = iter.next().ok_or(())?;
-        let (next_pos, _) = iter.next().unwrap_or((1, ' '));
-        self.pos += next_pos;
-        Ok(cur_char)
-    }
+    // fn skip_char(&mut self) -> Result<char, ()> {
+    //     let mut iter = self.source[self.pos..].char_indices();
+    //     let (_, cur_char) = iter.next().ok_or(())?;
+    //     let (next_pos, _) = iter.next().unwrap_or((1, ' '));
+    //     self.pos += next_pos;
+    //     Ok(cur_char)
+    // }
 
 }
 
 impl Lexer {
     pub fn read_token(&mut self) -> Result<Token, ()> {
-        match self.next()? {
-            'a'...'z' | 'A'...'Z' | '_' => self.read_alphabet(),
+        // let line = &self.source.lines();
+        match self.c()? {
+            '\'' | '"' => self.letter_quote(),
+            '#' => self.read_comment(),
+            'a'...'z' | 'A'...'Z' | '_' => self.read_identifier(),
             '0'...'9' => self.read_number(),
             '\n' | '\r' => self.read_newline(),
             c if c.is_whitespace() => {
@@ -68,7 +80,7 @@ impl Lexer {
         }
     }
 
-    fn read_alphabet(&mut self) -> Result<Token, ()> {
+    fn read_identifier(&mut self) -> Result<Token, ()> {
         let alphabet = self.skip_while(|c| c.is_alphanumeric() || c == '_')?;
         Ok(Token::new_identifier(alphabet))
     }
@@ -82,7 +94,7 @@ impl Lexer {
     }
 
     fn read_newline(&mut self) -> Result<Token, ()> {
-        let newline = self.skip_char()?;
+        let newline = self.next()?;
         Ok(Token::new_newline(newline.to_string()))
     }
 
@@ -91,14 +103,59 @@ impl Lexer {
         Ok(Token::new_indent(space))
     }
 
+    fn read_comment(&mut self) -> Result<Token, ()> {
+        self.skip_while(|c| c != '\n');
+        Ok(Token::new_pass())
+    }
+
     fn read_symbol(&mut self) -> Result<Token, ()> {
-        Ok(Token::new_symbol(self.skip_char()?.to_string()))
+        Ok(Token::new_symbol(self.next()?.to_string()))
     }
 }
 
-// #[test]
-// fn it_faild() {
-//     let mut lex = Lexer::new("a = 1 + 1".to_string());
-//     assert_eq!(lex.get_tokens().first().unwrap().kind, TokenKind::Newline);
+impl Lexer {
+    fn letter_quote(&mut self) -> Result<Token, ()> {
+        let quote = self.next()?;
+        let mut quote_siz: usize = 1; // 1 or 3
 
-// }
+        let mut v = vec![];
+
+        // v.push(self.next()? as u8);
+            // Ok(String::from_utf8_lossy(v.as_slice()).to_owned().to_string())
+
+        let mut q = self.next()?;
+        if quote == q {
+            q = self.next()?;
+            if quote == q {
+                quote_siz = 3;
+            }
+        }
+
+        let mut c: char;
+        let mut end_quote_size = 0;
+        while end_quote_size != quote_siz {
+            c = self.next()?;
+            if c == quote {
+                end_quote_size += 1;
+                continue
+            }
+            v.push(c as u8);
+        }
+        Ok(Token::new_literal(String::from_utf8_lossy(v.as_slice()).to_owned().to_string()))
+    }
+}
+
+#[test]
+fn test_c() {
+    let lex = Lexer::new("a = 1 + 1".to_string());
+    assert_eq!(lex.c().unwrap(), 'a');
+    assert_eq!(lex.c().unwrap(), 'a');
+}
+
+#[test]
+fn test_next() {
+    let mut lex = Lexer::new("a= 1 + 1".to_string());
+    assert_eq!(lex.c().unwrap(), 'a');
+    assert_eq!(lex.next().unwrap(), 'a');
+    assert_eq!(lex.c().unwrap(), '=');
+}

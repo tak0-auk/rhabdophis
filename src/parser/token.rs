@@ -14,6 +14,8 @@ pub enum TokenKind {
     Newline,
     Number,
     Indent,
+    Literal,
+    Pass,
 }
 
 impl Token {
@@ -57,6 +59,20 @@ impl Token {
         Token {
             kind: TokenKind::Indent,
             value: s,
+        }
+    }
+
+    pub fn new_literal(s: String) -> Token {
+        Token {
+            kind: TokenKind::Literal,
+            value: s,
+        }
+    }
+
+    pub fn new_pass() -> Token {
+        Token {
+            kind: TokenKind::Pass,
+            value: String::new(),
         }
     }
 }

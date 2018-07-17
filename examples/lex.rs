@@ -11,6 +11,6 @@ fn main() {
     println!("------------------------------");
     let mut lex = lexer::Lexer::new(text);
     for token in lex.get_tokens() {
-        println!("{:?}", token.value);
+        println!("{:?}", token);
     }
 }
