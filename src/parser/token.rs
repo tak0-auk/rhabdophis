@@ -1,78 +1,71 @@
 #[derive(Debug, Clone)]
 pub struct Token {
     pub kind: TokenKind,
-    pub value: String,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenKind {
-    Identifier,
+    Identifier(String),
     Int(i128),
     Float(f64),
     String(String),
-    Symbol,
+    Symbol(String),
     Newline,
     Number,
-    Indent,
-    Literal,
+    Indent(String),
+    Literal(String),
     Pass,
 }
 
 impl Token {
 
-    pub fn new(kind: TokenKind, v: String) -> Token {
+    pub fn new(kind: TokenKind) -> Token {
         Token {
             kind: kind,
-            value: v
         }
     }
 
-    pub fn new_identifier(name: String) -> Token {
+    pub fn new_identifier(ident: String) -> Token {
         Token {
-            kind: TokenKind::Identifier,
-            value: name,
+            kind: TokenKind::Identifier(ident),
         }
     }
 
-    pub fn new_number(n: String) -> Token {
+    pub fn new_int(i: i128) ->Token {
         Token {
-            kind: TokenKind::Number,
-            value: n,
+            kind: TokenKind::Int(i),
         }
     }
+
+
 
     pub fn new_symbol(s: String) -> Token {
         Token {
-            kind: TokenKind::Symbol,
-            value: s,
+            kind: TokenKind::Symbol(s),
         }
     }
 
-    pub fn new_newline(s: String) -> Token {
+    pub fn new_newline() -> Token {
         Token {
             kind: TokenKind::Newline,
-            value: s,
         }
     }
 
     pub fn new_indent(s: String) -> Token {
         Token {
-            kind: TokenKind::Indent,
-            value: s,
+            kind: TokenKind::Indent(s),
         }
     }
 
-    pub fn new_literal(s: String) -> Token {
+    pub fn new_literal(l: String) -> Token {
         Token {
-            kind: TokenKind::Literal,
-            value: s,
+            kind: TokenKind::Literal(l),
         }
     }
 
     pub fn new_pass() -> Token {
         Token {
             kind: TokenKind::Pass,
-            value: String::new(),
         }
     }
 }
