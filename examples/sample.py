@@ -39,5 +39,5 @@ def perm(l):
              for x in p:
               r.append(l[i:i+1] + x)
     return r
-print("""`lite)
+print("'lite")
     # comment

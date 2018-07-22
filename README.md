@@ -8,3 +8,7 @@ Pythonの処理系をRustで書いていこうと思います。
 
 Rhabdophis is Python interpreter
 
+
+~~~
+cargo run examples/sample.py
+~~~

@@ -53,19 +53,10 @@ impl Lexer {
             Ok(String::from_utf8_lossy(v.as_slice()).to_owned().to_string())
         }
 
-    // fn skip_char(&mut self) -> Result<char, ()> {
-    //     let mut iter = self.source[self.pos..].char_indices();
-    //     let (_, cur_char) = iter.next().ok_or(())?;
-    //     let (next_pos, _) = iter.next().unwrap_or((1, ' '));
-    //     self.pos += next_pos;
-    //     Ok(cur_char)
-    // }
-
 }
 
 impl Lexer {
     pub fn read_token(&mut self) -> Result<Token, ()> {
-        // let line = &self.source.lines();
         match self.c()? {
             '\'' | '"' => self.letter_quote(),
             '#' => {
@@ -116,9 +107,6 @@ impl Lexer {
         let mut quote_siz: usize = 1; // 1 or 3
 
         let mut v = vec![];
-
-        // v.push(self.next()? as u8);
-            // Ok(String::from_utf8_lossy(v.as_slice()).to_owned().to_string())
 
         let mut q = self.next()?;
         if quote == q {
@@ -171,14 +159,6 @@ fn test_read_token() {
         TokenKind::Literal(l) => assert_eq!(l, "test"),
         _ => assert!(false),
     }
-    let s = "'t
-    e
-    s
-    t'";
-    lex = Lexer::new(s.to_string());
-    match lex.read_token().unwrap().kind {
-        TokenKind::Literal(l) => assert_eq!(l, s),
-        _ => assert!(false),
-    }
-    // assert_eq!(lex.read_token().unwrap().kind, "test");
+    lex = Lexer::new("\t".to_string());
+    assert!(lex.c().unwrap().is_whitespace());
 }

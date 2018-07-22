@@ -14,7 +14,6 @@ pub enum TokenKind {
     Number,
     Indent(String),
     Literal(String),
-    Pass,
 }
 
 impl Token {
@@ -36,8 +35,6 @@ impl Token {
             kind: TokenKind::Int(i),
         }
     }
-
-
 
     pub fn new_symbol(s: String) -> Token {
         Token {
@@ -63,9 +60,4 @@ impl Token {
         }
     }
 
-    pub fn new_pass() -> Token {
-        Token {
-            kind: TokenKind::Pass,
-        }
-    }
 }
