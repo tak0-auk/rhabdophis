@@ -6,6 +6,7 @@ use parser::token::{ Token, TokenKind };
 pub struct Lexer {
     pub source: String,
     pos: usize,
+    is_begin_line: bool,
 }
 
 impl Lexer {
@@ -13,6 +14,7 @@ impl Lexer {
         Lexer {
             source: src,
             pos: 0,
+            is_begin_line: true,
         }
     }
 }
@@ -57,7 +59,7 @@ impl Lexer {
 
 impl Lexer {
     pub fn read_token(&mut self) -> Result<Token, ()> {
-        match self.c()? {
+        let r = match self.c()? {
             '\'' | '"' => self.letter_quote(),
             '#' => {
                 let _ = self.skip_while(|c| c != '\n');
@@ -65,12 +67,16 @@ impl Lexer {
             },
             'a'...'z' | 'A'...'Z' | '_' => self.read_identifier(),
             '0'...'9' => self.read_number(),
-            '\n' | '\r' => self.read_newline(),
+            '\n' | 'r' => {
+                self.is_begin_line = true;
+                self.read_newline()
+            },
             c if c.is_whitespace() => {
                 self.read_indent()
             }
             _ => self.read_symbol(),
-        }
+        };
+        return r;
     }
 
     fn read_identifier(&mut self) -> Result<Token, ()> {
@@ -92,13 +98,17 @@ impl Lexer {
     }
 
     fn read_indent(&mut self) -> Result<Token, ()> {
-        let space = self.skip_while(|c| c.is_whitespace())?;
-        Ok(Token::new_indent(space))
+        if self.is_begin_line {
+            let space = self.skip_while(|c| c.is_whitespace())?;
+            self.is_begin_line = false;
+            Ok(Token::new_indent(space))
+        }else {
+            let _space = self.skip_while(|c| c.is_whitespace())?;
+            self.read_token()
+        }
+
     }
 
-    fn read_symbol(&mut self) -> Result<Token, ()> {
-        Ok(Token::new_symbol(self.next()?.to_string()))
-    }
 }
 
 impl Lexer {
@@ -128,7 +138,73 @@ impl Lexer {
             }
             v.push(c as u8);
         }
-        Ok(Token::new_literal(String::from_utf8_lossy(v.as_slice()).to_owned().to_string()))
+        Ok(Token::new_string(String::from_utf8_lossy(v.as_slice()).to_owned().to_string()))
+    }
+
+    fn read_symbol(&mut self) -> Result<Token, ()> {
+        let kind = match self.next()? {
+            '(' => TokenKind::LPar,
+            ')' => TokenKind::RPar,
+            '[' => TokenKind::LSqb,
+            ']' => TokenKind::RSqb,
+            ':' => TokenKind::Colon,
+            ',' => TokenKind::Comma,
+            ';' => TokenKind::Semi,
+            '+' => TokenKind::Plus,
+            '-' => TokenKind::Minus,
+            '*' => TokenKind::Star,
+            '/' => TokenKind::Slash,
+            '|' => TokenKind::VBar,
+            '&' => TokenKind::Amper,
+            '<' => {
+                match self.c()? {
+                    '>' => {
+                        let _ = self.next();
+                        TokenKind::NotEqual
+                    },
+                    '=' => {
+                        let _ = self.next();
+                        TokenKind::LessEqual
+                    },
+                    '<' => {
+                        let _ = self.next();
+                        TokenKind::GreaterEqual
+                    },
+                    _ => TokenKind::Less,
+                }
+            },
+            '>' => TokenKind::Greater,
+            '=' => {
+                match self.c()? {
+                    '=' => TokenKind::EqEqual,
+                    _ => TokenKind::Equal,
+                }
+            },
+            '.' => TokenKind::Dot,
+            '%' => TokenKind::Percent,
+            '{' => TokenKind::LBrace,
+            '}' => TokenKind::RBrace,
+            '^' => TokenKind::Circumflex,
+            '~' => TokenKind::Tilde,
+            '@' => TokenKind::At,
+            '!' => {
+                match self.c()? {
+                    '=' => {
+                        let _ = self.next();
+                        TokenKind::NotEqual
+                    },
+                    _ => {
+                        self.pos -= 1;
+                        panic!("{:?}", self.c())
+                    },
+                }
+            },
+            _ => {
+                self.pos -= 1;
+                panic!("{:?}", self.c());
+            },
+        };
+        Ok(Token::new(kind))
     }
 }
 

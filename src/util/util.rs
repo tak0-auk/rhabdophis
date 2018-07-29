@@ -16,8 +16,3 @@ pub fn get_file_text(file_name: &str) -> String {
 
     text
 }
-
-// #[test]
-// fn tfo() {
-//     assert_eq!(get_file_text("README.md"), "");
-// }
