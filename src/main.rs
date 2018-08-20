@@ -1,5 +1,5 @@
 const DOC: &'static str =
-"Rhabdophis is implement for Rust
+"Rhabdophis is Python interpreter
 Try \' --help\' for more infomation";
 
 use std::env;

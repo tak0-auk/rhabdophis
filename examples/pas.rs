@@ -11,5 +11,5 @@ fn main() {
     print!("{}", text);
     println!("------------------------------");
     let mut parser = parser::Parser::new(lexer::Lexer::new(text).get_tokens());
-
+    parser.parse();
 }

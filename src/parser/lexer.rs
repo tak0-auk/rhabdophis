@@ -67,7 +67,7 @@ impl Lexer {
             },
             'a'...'z' | 'A'...'Z' | '_' => self.read_identifier(),
             '0'...'9' => self.read_number(),
-            '\n' | 'r' => {
+            '\n' | '\r' => {
                 self.is_begin_line = true;
                 self.read_newline()
             },
@@ -84,6 +84,7 @@ impl Lexer {
         Ok(Token::new_identifier(alphabet))
     }
 
+    // TODO: float support
     fn read_number(&mut self) -> Result<Token, ()> {
         let number = self.skip_while(|c| match c {
             '0'...'9' => true,
@@ -94,6 +95,9 @@ impl Lexer {
 
     fn read_newline(&mut self) -> Result<Token, ()> {
         let _newline = self.next()?;
+        if self.c()? == '\n' || self.c()? == '\r' {
+            let _ = self.next();
+        }
         Ok(Token::new_newline())
     }
 
