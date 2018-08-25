@@ -2,6 +2,7 @@ use std::io::{self, Write};
 
 use parser::lexer::Lexer;
 use parser::parser::Parser;
+use object;
 
 #[derive(Debug)]
 pub struct Runtime {
@@ -21,23 +22,22 @@ pub fn execute_file() {
 
 pub fn exec_repl() {
     let mut line = String::new();
-    // let mut token: Vec<Token> = vec![];
 
     loop {
         let _ = io::stdout().write(b">>> ");
         let _ = io::stdout().flush();
         match io::stdin().read_line(&mut line) {
             Ok(_) => {
-                let parser = Parser::new(
-                        Lexer::new(line.clone()).get_tokens()
-                );
-                line.clear();
-                println!("{:?}", parser);
+                let mut tokens = Lexer::new(line.clone()).get_tokens();
+                let mut parser = Parser::new(tokens);
+                parser.parse();
             },
             Err(_) => {
                 println!("error");
             },
         };
+
+        line.clear();
     }
     // io::stdout().write(src.as_bytes());
 }

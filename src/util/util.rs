@@ -17,7 +17,6 @@ pub fn get_file_text(file_name: &str) -> String {
     text
 }
 
-// #[test]
-// fn tfo() {
-//     assert_eq!(get_file_text("README.md"), "");
-// }
+pub fn is_space(c: char) -> bool {
+    (c != '\n' && c != '\r') && c.is_whitespace()
+}

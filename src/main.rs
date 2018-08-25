@@ -1,5 +1,5 @@
 const DOC: &'static str =
-"Rhabdophis is implement for Rust
+"Rhabdophis is Python interpreter
 Try \' --help\' for more infomation";
 
 use std::env;
@@ -7,15 +7,18 @@ use std::env;
 extern crate rhabdophis;
 use rhabdophis::util::util;
 use rhabdophis::runtime;
-use rhabdophis::parser;
+use rhabdophis::parser::lexer;
+use rhabdophis::parser::parser;
 
 fn main() {
     let args:Vec<String> = env::args().skip(1).collect();
     let _ = match args.first() {
         Some(file_name) => {
-            for token in parser::lexer::Lexer::new(util::get_file_text(file_name)).get_tokens(){
-                println!("{:?}", token);
-            };
+            let mut parser = parser::Parser::new(lexer::Lexer::new(
+                util::get_file_text(file_name)
+                ).get_tokens()
+            );
+            parser.parse();
         },
         None => {
             println!("{}", DOC);

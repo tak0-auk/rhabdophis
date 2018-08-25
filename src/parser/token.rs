@@ -8,12 +8,69 @@ pub enum TokenKind {
     Identifier(String),
     Int(i128),
     Float(f64),
-    String(String),
     Symbol(String),
-    Newline,
     Number,
-    Indent(String),
     Literal(String),
+    EndMarker,
+    NAME,
+    NUMBER,
+    String(String),
+    NewLine,
+    Indent(usize),
+    Dedent,
+    LPar,
+    RPar,
+    LSqb,
+    RSqb,
+    Colon,
+    Comma,
+    Semi,
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    VBar,
+    Amper,
+    Less,
+    Greater,
+    Equal,
+    Dot,
+    Percent,
+    LBrace,
+    RBrace,
+    EqEqual,
+    NotEqual,
+    LessEqual,
+    GreaterEqual,
+    Tilde,
+    Circumflex,
+    Leftshift,
+    Rightshift,
+    Doublestar,
+    PlusEqual,
+    MinEqual,
+    StarEqual,
+    SlashEqual,
+    PercentEqual,
+    AmperEqual,
+    VbarEqual,
+    CircumflexEqual,
+    LeftshiftEqual,
+    RightshiftEqual,
+    DoublestarEqual,
+    Doubleslash,
+    DoubleslashEqual,
+    At,
+    AtEqual,
+    Rarrow,
+    Ellipsis,
+    /* This Table Must Match The #defines In Token.h! */
+    Op,
+    // <errortoken>,
+    Comment,
+    Nl,
+    Encoding,
+    // <n_tokens>,
 }
 
 impl Token {
@@ -44,19 +101,19 @@ impl Token {
 
     pub fn new_newline() -> Token {
         Token {
-            kind: TokenKind::Newline,
+            kind: TokenKind::NewLine,
         }
     }
 
-    pub fn new_indent(s: String) -> Token {
+    pub fn new_indent(s: usize) -> Token {
         Token {
             kind: TokenKind::Indent(s),
         }
     }
 
-    pub fn new_literal(l: String) -> Token {
+    pub fn new_string(s: String) -> Token {
         Token {
-            kind: TokenKind::Literal(l),
+            kind: TokenKind::String(s),
         }
     }
 
