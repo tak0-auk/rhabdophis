@@ -1,2 +1,2 @@
 pub mod object;
-pub mod pyIntObject;
+pub mod  int_object;

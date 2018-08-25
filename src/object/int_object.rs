@@ -13,6 +13,10 @@ impl PyIntObject {
             val: i
         }
     }
+
+    pub fn eval(self) -> i128 {
+        self.val
+    }
 }
 
 // TODO: commonize
@@ -30,4 +34,10 @@ impl Add for PyIntObject {
     fn add(self, other: PyIntObject) -> PyIntObject {
         PyIntObject { val: self.val + other.val }
     }
+}
+
+
+#[test]
+fn add() {
+    assert_eq!((PyIntObject::new(1) + PyIntObject::new(10)).eval(), 11);
 }

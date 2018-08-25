@@ -2,11 +2,16 @@ use std::str::FromStr;
 
 use parser::token::{ Token, TokenKind };
 
+use util::util;
+
+const TABSIZE: &'static usize = &4;
+
 #[derive(Debug)]
 pub struct Lexer {
     pub source: String,
     pos: usize,
     is_begin_line: bool,
+    indent_level: Vec<usize>,
 }
 
 impl Lexer {
@@ -15,9 +20,12 @@ impl Lexer {
             source: src,
             pos: 0,
             is_begin_line: true,
+            indent_level: vec![],
         }
     }
 }
+
+
 
 impl Lexer {
     pub fn get_tokens(&mut self) -> Vec<Token> {
@@ -76,6 +84,7 @@ impl Lexer {
             }
             _ => self.read_symbol(),
         };
+
         return r;
     }
 
@@ -83,6 +92,7 @@ impl Lexer {
         let alphabet = self.skip_while(|c| c.is_alphanumeric() || c == '_')?;
         Ok(Token::new_identifier(alphabet))
     }
+
 
     // TODO: float support
     fn read_number(&mut self) -> Result<Token, ()> {
@@ -103,15 +113,30 @@ impl Lexer {
 
     fn read_indent(&mut self) -> Result<Token, ()> {
         if self.is_begin_line {
-            let space = self.skip_while(|c| c.is_whitespace())?;
+            let mut col = 0;
             self.is_begin_line = false;
-            Ok(Token::new_indent(space))
+            while (!self.is_eos()) && util::is_space(self.c()?){
+                let c = self.c()?;
+                if c == ' '{
+                    col += 1;
+                }else if c == '\t' {
+                    col += TABSIZE;
+                }
+                self.pos += 1;
+            }
+            if col != 0 {
+                Ok(Token::new_indent(col))
+            }else {
+                self.read_token()
+            }
+
         }else {
             let _space = self.skip_while(|c| c.is_whitespace())?;
             self.read_token()
         }
 
     }
+
 
 }
 
@@ -229,16 +254,12 @@ fn test_next() {
 
 #[test]
 fn test_read_token() {
-    let mut lex = Lexer::new("\"test\"".to_string());
-    match lex.read_token().unwrap().kind {
-        TokenKind::Literal(l) => assert_eq!(l, "test"),
-        _ => assert!(false),
-    }
-    lex = Lexer::new("'''test'''".to_string());
-    match lex.read_token().unwrap().kind {
-        TokenKind::Literal(l) => assert_eq!(l, "test"),
-        _ => assert!(false),
-    }
-    lex = Lexer::new("\t".to_string());
+    let mut lex = Lexer::new("\t".to_string());
     assert!(lex.c().unwrap().is_whitespace());
+}
+
+#[test]
+fn test_get_tokens() {
+    let mut lex = Lexer::new("a= 1 + 1".to_string());
+    lex.get_tokens();
 }

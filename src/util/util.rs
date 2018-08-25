@@ -16,3 +16,7 @@ pub fn get_file_text(file_name: &str) -> String {
 
     text
 }
+
+pub fn is_space(c: char) -> bool {
+    (c != '\n' && c != '\r') && c.is_whitespace()
+}

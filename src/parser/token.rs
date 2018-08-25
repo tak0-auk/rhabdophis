@@ -15,8 +15,8 @@ pub enum TokenKind {
     NAME,
     NUMBER,
     String(String),
-    Newline,
-    Indent(String),
+    NewLine,
+    Indent(usize),
     Dedent,
     LPar,
     RPar,
@@ -101,11 +101,11 @@ impl Token {
 
     pub fn new_newline() -> Token {
         Token {
-            kind: TokenKind::Newline,
+            kind: TokenKind::NewLine,
         }
     }
 
-    pub fn new_indent(s: String) -> Token {
+    pub fn new_indent(s: usize) -> Token {
         Token {
             kind: TokenKind::Indent(s),
         }
