@@ -30,8 +30,15 @@ impl Lexer {
 impl Lexer {
     pub fn get_tokens(&mut self) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
+        // if util::is_space(self.c().unwrap()) {
+        //     tokens.push(self.read_indent().unwrap());
+        // }
         while let Ok(token) = self.read_token() {
+            if token.kind == TokenKind::NewLine {
+                self.is_begin_line = true;
+            }
             tokens.push(token);
+
         }
         return tokens;
     }
@@ -76,7 +83,6 @@ impl Lexer {
             'a'...'z' | 'A'...'Z' | '_' => self.read_identifier(),
             '0'...'9' => self.read_number(),
             '\n' | '\r' => {
-                self.is_begin_line = true;
                 self.read_newline()
             },
             c if c.is_whitespace() => {
@@ -84,6 +90,7 @@ impl Lexer {
             }
             _ => self.read_symbol(),
         };
+        self.is_begin_line = false;
 
         return r;
     }
