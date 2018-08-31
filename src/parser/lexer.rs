@@ -20,19 +20,15 @@ impl Lexer {
             source: src,
             pos: 0,
             is_begin_line: true,
-            indent_level: vec![],
+            indent_level: vec![0],
         }
     }
 }
 
 
-
 impl Lexer {
     pub fn get_tokens(&mut self) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
-        // if util::is_space(self.c().unwrap()) {
-        //     tokens.push(self.read_indent().unwrap());
-        // }
         while let Ok(token) = self.read_token() {
             if token.kind == TokenKind::NewLine {
                 self.is_begin_line = true;
@@ -40,6 +36,7 @@ impl Lexer {
             tokens.push(token);
 
         }
+        println!("{:?}", self.indent_level);
         return tokens;
     }
 }
@@ -131,11 +128,18 @@ impl Lexer {
                 }
                 self.pos += 1;
             }
-            if col != 0 {
-                Ok(Token::new_indent(col))
-            }else {
-                self.read_token()
+            if &col > self.indent_level.last().unwrap_or(&0){
+                self.indent_level.push(col);
             }
+            if &col < self.indent_level.last().unwrap() {
+                println!("{}", self.indent_level.pop().unwrap())
+                // while self.indent_level.pop().unwrap() != col{
+                //     println!("{}", self.indent_level.last().unwrap())
+                // };
+            }
+            println!("{:?}", self.indent_level);
+            Ok(Token::new_indent(col))
+
 
         }else {
             let _space = self.skip_while(|c| c.is_whitespace())?;
@@ -244,29 +248,52 @@ impl Lexer {
     }
 }
 
-#[test]
-fn test_c() {
-    let lex = Lexer::new("a = 1 + 1".to_string());
-    assert_eq!(lex.c().unwrap(), 'a');
-    assert_eq!(lex.c().unwrap(), 'a');
+#[cfg(test)]
+mod tests {
+    use parser::lexer::Lexer;
+
+    #[test]
+    fn test_c() {
+        let lex = Lexer::new("a = 1 + 1".to_string());
+        assert_eq!(lex.c().unwrap(), 'a');
+        assert_eq!(lex.c().unwrap(), 'a');
+    }
+
+    #[test]
+    fn test_next() {
+        let mut lex = Lexer::new("a= 1 + 1".to_string());
+        assert_eq!(lex.c().unwrap(), 'a');
+        assert_eq!(lex.next().unwrap(), 'a');
+        assert_eq!(lex.c().unwrap(), '=');
+    }
+
+    #[test]
+    fn test_read_token() {
+        let mut lex = Lexer::new("\t".to_string());
+        assert!(lex.c().unwrap().is_whitespace());
+    }
+
+    #[test]
+    fn test_get_tokens() {
+        let mut lex = Lexer::new("a= 1 + 1".to_string());
+        lex.get_tokens();
+    }
+
+    #[test]
+    fn test_indent() {
+        let text =
+    " def perm(l):                       # error: first line indented
+    for i in range(len(l)):             # error: not indented
+        s = l[:i] + l[i+1:]
+            p = perm(l[:i] + l[i+1:])   # error: unexpected indent
+            for x in p:
+                    r.append(l[i:i+1] + x)
+                return r                # error: inconsistent dedent".to_string();
+        Lexer::new(text).get_tokens();
+
+    }
+
 }
 
-#[test]
-fn test_next() {
-    let mut lex = Lexer::new("a= 1 + 1".to_string());
-    assert_eq!(lex.c().unwrap(), 'a');
-    assert_eq!(lex.next().unwrap(), 'a');
-    assert_eq!(lex.c().unwrap(), '=');
-}
 
-#[test]
-fn test_read_token() {
-    let mut lex = Lexer::new("\t".to_string());
-    assert!(lex.c().unwrap().is_whitespace());
-}
 
-#[test]
-fn test_get_tokens() {
-    let mut lex = Lexer::new("a= 1 + 1".to_string());
-    lex.get_tokens();
-}

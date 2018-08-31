@@ -37,7 +37,8 @@ def perm(l):
              s = l[:i] + l[i+1:]
              p = perm(s)
              for x in p:
-              r.append(l[i:i+1] + x)
+                # comment
+                r.append(l[i:i+1] + x)
     return r
 print("'lite")
     # comment

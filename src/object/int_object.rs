@@ -19,13 +19,19 @@ impl PyIntObject {
     }
 }
 
-// TODO: commonize
-impl PyIntObject {
+impl TypeObject for PyIntObject {
 
-    pub fn equal(self, obj: PyIntObject) -> bool {
-        self.val == obj.val
+    fn get_id(&self) -> i128 {
+        self.val
     }
 
+    fn equal<'a>(self, obj: &'a TypeObject) -> bool {
+        match obj {
+            PyIntObject => self.get_id() == obj.get_id(),
+            _ => panic!(""),
+        }
+
+    }
 }
 
 impl Add for PyIntObject {
@@ -40,4 +46,10 @@ impl Add for PyIntObject {
 #[test]
 fn add() {
     assert_eq!((PyIntObject::new(1) + PyIntObject::new(10)).eval(), 11);
+}
+#[test]
+fn equal() {
+    let p1 = PyIntObject::new(1);
+    let p2 = PyIntObject::new(1);
+    assert!(p1.equal(&p2));
 }

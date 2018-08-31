@@ -18,9 +18,13 @@ impl Parser {
 
 impl Parser {
     pub fn parse(&mut self) {
-        let mut before_obj: Box<PyObject>;
+        // let mut before_obj: Box<PyObject>;
         for token in &self.tokens {
             match token.kind {
+                TokenKind::Identifier(ref s) => {
+                    PyObject::new(s.clone());
+                    // print!("{}", s);
+                },
                 TokenKind::Int(i) => {
                     let int = PyIntObject::new(i);
                     println!("{:?}", int);
