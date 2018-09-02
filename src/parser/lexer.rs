@@ -36,7 +36,7 @@ impl Lexer {
             tokens.push(token);
 
         }
-        println!("{:?}", self.indent_level);
+        // println!("{:?}", self.indent_level);
         return tokens;
     }
 }
@@ -52,7 +52,7 @@ impl Lexer {
 
     fn next(&mut self) -> Result<char, ()> {
         let ret = self.source[self.pos..].chars().next().ok_or(());
-        self.pos += 1;
+        self.pos += ret.unwrap().len_utf8();
         return ret;
     }
 
@@ -269,7 +269,7 @@ mod tests {
 
     #[test]
     fn test_read_token() {
-        let mut lex = Lexer::new("\t".to_string());
+        let lex = Lexer::new("\t".to_string());
         assert!(lex.c().unwrap().is_whitespace());
     }
 

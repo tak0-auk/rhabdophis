@@ -4,16 +4,20 @@ use std::ops::*;
 #[derive(Debug)]
 pub struct PyObject {
     pub name: String,
-    pub pyType: Option<Box<TypeObject>>,
+    pub py_type: Option<Box<TypeObject>>,
 }
 
 impl PyObject {
     pub fn new(s: String) -> PyObject {
         PyObject {
             name: s,
-            pyType: None,
+            py_type: None,
         }
     }
+
+    // pub fn set_type(self, pt: &mut  TypeObject) {
+    //     self.py_type = Some(Box::new(*pt));
+    // }
 }
 
 trait Object {
@@ -28,9 +32,11 @@ trait Object {
 
 pub trait TypeObject {
 
-    fn get_id(&self) -> i128;
+    // fn get_id(&self) -> i128;
 
-    fn equal<'a>(self, obj: &'a TypeObject) -> bool;
+    fn get_type(self) -> String;
+
+    // fn equal<'a>(self, obj: &'a TypeObject) -> bool;
 
 }
 
