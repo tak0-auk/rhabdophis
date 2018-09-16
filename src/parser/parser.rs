@@ -18,7 +18,7 @@ impl Parser {
 }
 
 impl Parser {
-    pub fn parse(&mut self) {
+    pub fn parse(&mut self) -> Vec<PyObject> {
         // let mut before_obj: Box<PyObject>;
         let mut nodes: Vec<PyObject> = vec![];
         // let ti = &self.tokens.iter();
@@ -27,6 +27,7 @@ impl Parser {
                 TokenKind::Identifier(ref s) => {
                     let obj = PyObject::new(s.clone());
                     println!("{:?}", obj);
+                    nodes.push(obj);
                 },
                 TokenKind::Int(i) => {
                     let int = PyIntObject::new(i);
@@ -49,6 +50,7 @@ impl Parser {
             }
         }
 
+        return nodes;
 
     }
 
